@@ -22,6 +22,7 @@ class Inventory_page(Login_page):
     REMOVE_BTN = (By.XPATH, '//button[contains(text(),"Remove")]')
     SORT_DROPDOWN = (By.CLASS_NAME, "product_sort_container")
     INVENTORY_ITEM_PRICE = (By.CLASS_NAME, "inventory_item_price")
+    INVENTORY_ITEM_NAME = (By.XPATH, '//div[@class="inventory_item_name "]')
 
 
     def get_add_cart_locator(self, item):
@@ -82,7 +83,7 @@ class Inventory_page(Login_page):
 
         for i in range(len(prices) - 1):
             price_text.append(prices[i].text.replace("$",""))
-            if int(prices[i].text.replace("$","")) > int(prices[i + 1].text.replace("$","")):
+            if float(prices[i].text.replace("$","")) > float(prices[i + 1].text.replace("$","")):
                 is_price_ascending = False
                 break
         assert is_price_ascending == True, "Error prices are not sorted ascending"
@@ -91,23 +92,41 @@ class Inventory_page(Login_page):
         prices = self.chrome.find_elements(*self.INVENTORY_ITEM_PRICE)
         is_price_ascending = True
         for i in range(len(prices) - 1):
-            if prices[i].text.replace("$","") < prices[i + 1].text.replace("$",""):
+            if float(prices[i].text.replace("$","")) < float(prices[i + 1].text.replace("$","")):
                 is_price_ascending = False
                 break
         assert is_price_ascending == True, "Error prices are not sorted ascending"
 
     def sort_products_by_name_ascending(self):
         sort_dropdown = Select(self.chrome.find_element(*self.SORT_DROPDOWN))
-        sort_dropdown.select_by_visible_text("Name (low to high)")
+        sort_dropdown.select_by_visible_text("Name (A to Z)")
 
     def sort_products_by_name_descending(self):
         sort_dropdown = Select(self.chrome.find_element(*self.SORT_DROPDOWN))
-        sort_dropdown.select_by_visible_text("Name (high to low)")
+        sort_dropdown.select_by_visible_text("Name (Z to A)")
     def check_products_are_sorted_by_name_ascending(self):
-        pass
+        name = self.chrome.find_elements(*self.INVENTORY_ITEM_NAME)
+        is_name_ascending = True
+        name_text = []
+
+        for i in range(len(name) - 1):
+            name_text.append(name[i].text)
+            if name[i].text > name[i + 1].text:
+                is_name_ascending = False
+                break
+        assert is_name_ascending == True, "Error name are not sorted ascending"
 
     def check_products_are_sorted_by_name_descending(self):
-        pass
+        name = self.chrome.find_elements(*self.INVENTORY_ITEM_NAME)
+        is_name_descending = True
+        name_text = []
+
+        for i in range(len(name) - 1):
+            name_text.append(name[i].text)
+            if name[i].text < name[i + 1].text:
+                is_name_descending = False
+                break
+        assert is_name_descending == True, "Error name are not sorted descending"
 
 
 
